@@ -1,0 +1,51 @@
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace std;
+using namespace cv;
+
+/*int contrastEnh(int input, int x1, int y1, int x2, int y2)
+{
+	double output;
+	if (0 <= input && input <= x1) {
+		output = y1 / x1 * input;
+	}
+	else if (x1 < input && input <= x2) {
+		output = ((y2 - y1) / (x2 - x1)) * (input - x1) + y1;
+	}
+	else if (x2 < input && input <= 255) {
+		output = ((255 - y2) / (255 - x2)) * (input - x2) + y2;
+	}
+	return (int)output;
+}*/
+Mat img = imread("C://images//Lenna.jpg");
+Mat roi;
+int mx1, my1, mx2, my2;// 마우스로 지정한 사각형의 좌표
+bool cropping = false; // 사각형 선택 중임을 나타내는 플래그 변수
+// 마우스 이벤트가 발생하면 호출되는 콜백 함수이다.
+void onMouse(int event, int x, int y, int flags, void* param)
+{
+	if (event == EVENT_LBUTTONDOWN) { // 마우스의 왼쪽 버튼을 누르면
+		mx1 = x; // 사각형의 좌측 상단 좌표 저장
+		my1 = y;
+		cropping = true;
+	}
+	else if (event == EVENT_LBUTTONUP) { // 마우스의 왼쪽 버튼에서 손을 떼면
+		mx2 = x; // 사각형의 우측 하단 좌표 저장
+		my2 = y;
+		cropping = false;
+		rectangle(img, Rect(mx1, my1, mx2 - mx1, my2 - my1), Scalar(0, 255, 0), 2);
+		Mat clone = img.clone();
+		roi = clone(Rect(mx1, my1, mx2 - mx1, my2 - my1));
+		imshow("image", img);
+	}
+}
+
+int main() {
+	
+	imshow("image", img);
+	setMouseCallback("image", onMouse);
+	waitKey();
+	return 0;
+}
+
