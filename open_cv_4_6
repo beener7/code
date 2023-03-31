@@ -1,0 +1,44 @@
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace std;
+using namespace cv;
+
+/*int contrastEnh(int input, int x1, int y1, int x2, int y2)
+{
+	double output;
+	if (0 <= input && input <= x1) {
+		output = y1 / x1 * input;
+	}
+	else if (x1 < input && input <= x2) {
+		output = ((y2 - y1) / (x2 - x1)) * (input - x1) + y1;
+	}
+	else if (x2 < input && input <= 255) {
+		output = ((255 - y2) / (255 - x2)) * (input - x2) + y2;
+	}
+	return (int)output;
+}*/
+
+int main()
+{
+	Mat img1 = imread("C://images//Lenna.jpg", IMREAD_GRAYSCALE);
+	imshow("Original Image", img1);
+
+	Mat table(1, 256, CV_8U); // ①
+
+	uchar* p = table.ptr();
+	for (int i = 0; i < 90; ++i)
+		p[i] = i;
+	for (int i = 90; i < 192; ++i)
+		p[i] = 0;
+	for (int i = 192; i < 256; ++i)
+		p[i] = i;
+
+	Mat img2;
+	LUT(img1, table, img2);
+
+	imshow("New Image", img2);
+	waitKey(0);
+
+	return 0;
+}
