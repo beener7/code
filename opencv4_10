@@ -18,7 +18,8 @@ using namespace cv;
 	}
 	return (int)output;
 }*/
-Mat img = imread("C://images//Lenna.jpg");
+/*
+Mat img = imread("C://images//cute_cat.jpg");
 Mat roi;
 int mx1, my1, mx2, my2;// 마우스로 지정한 사각형의 좌표
 bool cropping = false; // 사각형 선택 중임을 나타내는 플래그 변수
@@ -35,17 +36,16 @@ void onMouse(int event, int x, int y, int flags, void* param)
 		my2 = y;
 		cropping = false;
 		rectangle(img, Rect(mx1, my1, mx2 - mx1, my2 - my1), Scalar(0, 255, 0), 2);
-		Mat clone = img.clone();
-		roi = clone(Rect(mx1, my1, mx2 - mx1, my2 - my1));
+		roi = img(Rect(mx1, my1, mx2 - mx1, my2 - my1));
+		roi.convertTo(roi, -1, 1.5, 0);
 		imshow("image", img);
 	}
 }
 
 int main() {
-	
 	imshow("image", img);
 	setMouseCallback("image", onMouse);
 	waitKey();
 	return 0;
 }
-
+*/
