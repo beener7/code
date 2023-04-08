@@ -26,6 +26,7 @@ bool cropping = false; // 사각형 선택 중임을 나타내는 플래그 변�
 // 마우스 이벤트가 발생하면 호출되는 콜백 함수이다.
 void onMouse(int event, int x, int y, int flags, void* param)
 {
+	int tempx, tempy;
 	if (event == EVENT_LBUTTONDOWN) { // 마우스의 왼쪽 버튼을 누르면
 		mx1 = x; // 사각형의 좌측 상단 좌표 저장
 		my1 = y;
@@ -35,6 +36,8 @@ void onMouse(int event, int x, int y, int flags, void* param)
 		mx2 = x; // 사각형의 우측 하단 좌표 저장
 		my2 = y;
 		cropping = false;
+		if (mx2 < mx1) { tempx = mx1; mx1 = mx2; mx2 = tempx; }
+		if( my2 <my1){ tempy = my1; my1 = my2; my2 = tempy; }
 		rectangle(img, Rect(mx1, my1, mx2 - mx1, my2 - my1), Scalar(0, 255, 0), 2);
 		roi = img(Rect(mx1, my1, mx2 - mx1, my2 - my1));
 		roi.convertTo(roi, -1, 1.5, 0);
