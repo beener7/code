@@ -1,0 +1,43 @@
+import cv2
+import numpy as np
+
+prototxt = "SSD_data/deploy.prototxt"
+caffemodel = "SSD_data/res10_300x300_ssd_iter_140000_fp16.caffemodel"
+detector = cv2.dnn.readNet(prototxt, caffemodel)
+
+capture = cv2.VideoCapture(0)
+if capture.isOpened() == False:
+    raise Exception("카메라 연결 안됨")
+
+title = "View Frame from Camera"
+while True:
+    ret,frame = capture.read()
+    if not ret:break
+
+    (h,w) = frame.shape[:2]
+    target_size = (300,300)
+    input_image = cv2.resize(frame,target_size)
+
+    imageBlob = cv2.dnn.blobFromImage(input_image)
+    detector.setInput(imageBlob)
+
+    detections = detector.forward()
+
+    results = detections[0][0]
+    threshold = 0.8
+    for i in range(0,results.shape[0]):
+        conf = results[i,2]
+        if conf < threshold:
+            continue
+        box = results[i,3:7] *np.array([w,h,w,h])
+
+        (startX,startY,endX,endY) = box.astype('int')
+        roi = frame[startY:endY,startX:endX]
+        cv2.imwrite('image13.jpg', roi)
+        #cv2.putText(image,출력문자열, 출력좌표, 폰트, 폰트크기, 폰트색상, 두께 )
+        cv2.putText(frame,str(conf),(startX,startY-10),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
+        cv2.rectangle(frame,(startX,startY),(endX,endY),(0,255,0),2)
+
+    cv2.imshow(title,frame)
+    if cv2.waitKey(30) >= 0: break
+capture.release()
