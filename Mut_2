@@ -11,6 +11,13 @@ namespace ConsoleApp3
     {
         static void Main(string[] args)
         {
+
+
+            IPAddress ip1 = IPAddress.Parse("192.168.1.13");
+            IPEndPoint ipend1 = new IPEndPoint(ip1, 8080);
+
+            Console.WriteLine(ipend1);
+
             IPHostEntry hostEntry = Dns.GetHostEntry("www.google.com");
             //리턴 정보안에 포함되는 내용: 호스트네임,호스트 ip, 호스트 별명
             //hostEntry.HostName : 호스트네임
@@ -34,6 +41,8 @@ namespace ConsoleApp3
             {
                 Console.WriteLine(ip);
             }
+
+
 
 
         }
