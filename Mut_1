@@ -15,15 +15,26 @@ namespace ConsoleApp3
             IPAddress ip1 = IPAddress.Parse("192.168.1.13");
 
             IPAddress ip2 = new IPAddress(new byte[]{ 192 ,168,1, 13 });
+            
+            IPAddress ip3 = new IPAddress(218212544); //192.168.1.13
+            //IPAddress ip3 = new IPAddress(218212545); //193.168.1.13
 
-            IPAddress ip3 = new IPAddress(218212544);
+            IPAddress ip4 = new IPAddress(123123123); //임의의 값
 
+            Console.WriteLine(ip1.ToString());
+            Console.WriteLine(ip2.ToString());
             Console.WriteLine(ip3.ToString());
+            Console.WriteLine(ip4.ToString());
 
             // 유용한 IPAddress 메서드 
             IPAddress ip = IPAddress.Parse("216.58.216.174");
 
             byte[] ipbytes = ip.GetAddressBytes(); //IP를 바이트 배열로
+
+            for(int i =0; i < ipbytes.Length; i++) 
+            {
+                Console.WriteLine(ipbytes[i]);
+            }
 
             IPAddress ipv6 = ip.MapToIPv6(); // IPv4를 IPv6로 매핑
 
