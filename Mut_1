@@ -12,8 +12,6 @@ namespace ConsoleApp3
         static void Main(string[] args)
         {
 
-            내가 그리는 
-            치킨 그림 
             //아래는 모두 동일한 ip 주소
             IPAddress ip1 = IPAddress.Parse("192.168.1.13");
 
