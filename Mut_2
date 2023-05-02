@@ -18,6 +18,7 @@ namespace ConsoleApp3
 
 
             Console.WriteLine(hostEntry.HostName);
+
             foreach(IPAddress ip in hostEntry.AddressList)
             {
                 Console.WriteLine(ip);
@@ -26,6 +27,14 @@ namespace ConsoleApp3
             //로컬 호스트명 정보 얻기
             string hostname = Dns.GetHostName();
             IPHostEntry localhost = Dns.GetHostEntry(hostname);
+
+            Console.WriteLine(localhost.HostName);
+
+            foreach (IPAddress ip in localhost.AddressList)
+            {
+                Console.WriteLine(ip);
+            }
+
 
         }
     }
