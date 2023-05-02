@@ -1,0 +1,34 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net;
+
+namespace ConsoleApp3
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //아래는 모두 동일한 ip 주소
+            IPAddress ip1 = IPAddress.Parse("192.168.1.13");
+
+            IPAddress ip2 = new IPAddress(new byte[]{ 192 ,168,1, 13 });
+
+            IPAddress ip3 = new IPAddress(218212544);
+
+            Console.WriteLine(ip3.ToString());
+
+            // 유용한 IPAddress 메서드 
+            IPAddress ip = IPAddress.Parse("216.58.216.174");
+
+            byte[] ipbytes = ip.GetAddressBytes(); //IP를 바이트 배열로
+
+            IPAddress ipv6 = ip.MapToIPv6(); // IPv4를 IPv6로 매핑
+
+            Console.WriteLine(ipv6.ToString());
+
+        }
+    }
+}
