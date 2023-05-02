@@ -29,11 +29,11 @@ namespace ConsoleApp3
             // 유용한 IPAddress 메서드 
             IPAddress ip = IPAddress.Parse("216.58.216.174");
 
-            byte[] ipbytes = ip.GetAddressBytes(); //IP를 바이트 배열로
+            byte[] ipbytes = ip.GetAddressBytes(); //IP를 바이트 배열로 인스턴스 메소드(객체를 통해서 접근 가능한 메소드)
 
             for(int i =0; i < ipbytes.Length; i++) 
             {
-                Console.WriteLine(ipbytes[i]);
+                Console.WriteLine(ipbytes[i]);// 정적메소드(클래스를 통해서 사용 가능한 메소드)
             }
 
             IPAddress ipv6 = ip.MapToIPv6(); // IPv4를 IPv6로 매핑
