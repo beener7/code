@@ -11,34 +11,39 @@ namespace ConsoleApp3
     {
         static void Main(string[] args)
         {
-            //아래는 모두 동일한 ip 주소
+
+
             IPAddress ip1 = IPAddress.Parse("192.168.1.13");
+            IPEndPoint ipend1 = new IPEndPoint(ip1, 8080);
 
-            IPAddress ip2 = new IPAddress(new byte[]{ 192 ,168,1, 13 });
-            
-            IPAddress ip3 = new IPAddress(218212544); //192.168.1.13
-            //IPAddress ip3 = new IPAddress(218212545); //193.168.1.13
+            Console.WriteLine(ipend1);
 
-            IPAddress ip4 = new IPAddress(123123123); //임의의 값
+            IPHostEntry hostEntry = Dns.GetHostEntry("www.google.com");
+            //리턴 정보안에 포함되는 내용: 호스트네임,호스트 ip, 호스트 별명
+            //hostEntry.HostName : 호스트네임
+            //hostEntry.AddressList : 호스트IP주소 (IPAddress 배열타입)
 
-            Console.WriteLine(ip1.ToString());
-            Console.WriteLine(ip2.ToString());
-            Console.WriteLine(ip3.ToString());
-            Console.WriteLine(ip4.ToString());
 
-            // 유용한 IPAddress 메서드 
-            IPAddress ip = IPAddress.Parse("216.58.216.174");
+            Console.WriteLine(hostEntry.HostName);
 
-            byte[] ipbytes = ip.GetAddressBytes(); //IP를 바이트 배열로 인스턴스 메소드(객체를 통해서 접근 가능한 메소드)
-
-            for(int i =0; i < ipbytes.Length; i++) 
+            foreach(IPAddress ip in hostEntry.AddressList)
             {
-                Console.WriteLine(ipbytes[i]);// 정적메소드(클래스를 통해서 사용 가능한 메소드)
+                Console.WriteLine(ip);
             }
 
-            IPAddress ipv6 = ip.MapToIPv6(); // IPv4를 IPv6로 매핑
+            //로컬 호스트명 정보 얻기
+            string hostname = Dns.GetHostName();
+            IPHostEntry localhost = Dns.GetHostEntry(hostname);
 
-            Console.WriteLine(ipv6.ToString());
+            Console.WriteLine(localhost.HostName);
+
+            foreach (IPAddress ip in localhost.AddressList)
+            {
+                Console.WriteLine(ip);
+            }
+
+
+
 
         }
     }
