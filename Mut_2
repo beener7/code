@@ -1,0 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net;
+
+namespace ConsoleApp3
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            IPHostEntry hostEntry = Dns.GetHostEntry("www.google.com");
+            //리턴 정보안에 포함되는 내용: 호스트네임,호스트 ip, 호스트 별명
+            //hostEntry.HostName : 호스트네임
+            //hostEntry.AddressList : 호스트IP주소 (IPAddress 배열타입)
+
+
+            Console.WriteLine(hostEntry.HostName);
+            foreach(IPAddress ip in hostEntry.AddressList)
+            {
+                Console.WriteLine(ip);
+            }
+
+            //로컬 호스트명 정보 얻기
+            string hostname = Dns.GetHostName();
+            IPHostEntry localhost = Dns.GetHostEntry(hostname);
+
+        }
+    }
+}
