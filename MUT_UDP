@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net.Sockets;
+using System.Net;
+
+namespace ConsoleApp5
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //(1) UdpClient 객체 생성
+            UdpClient cli = new UdpClient();
+
+            string msg = "안녕하세요";
+            byte[] datagram = Encoding.UTF8.GetBytes(msg);
+            //65507 최대
+            //(2)데이타송신
+            try 
+            {
+                cli.Send(datagram, datagram.Length, "127.0.0.1", 7777);
+            }
+            catch(Exception e) 
+            {
+                Console.WriteLine(e);
+                Console.WriteLine("서버 전송 불가");
+            }
+            Console.WriteLine("[Send] 127.0.0.1:7777 로 {0} 바이트 전송", datagram.Length);
+
+            //(3)데이타 수신
+            IPEndPoint epRemote = new IPEndPoint(IPAddress.Any, 0);
+            try
+            {
+                byte[] bytes = cli.Receive(ref epRemote);
+                Console.WriteLine("[Receive] {0} 로부터 {1} 바이트 수신", epRemote.ToString(), bytes.Length);
+
+                //(4)UDP 객체 닫기
+                cli.Close();
+            }
+            catch(Exception e) 
+            {
+                Console.WriteLine("서버 맛갔음");
+            }
+        }
+    }
+}
