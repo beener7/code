@@ -1,0 +1,27 @@
+import cv2
+import numpy as np
+
+img_list = []
+
+for i in range(0,10):
+    fname = "face_img/train/train{0:03d}.jpg".format(i)
+    img = cv2.imread(fname,cv2.IMREAD_COLOR)
+
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    newGray = cv2.resize(gray, (150,120))
+    #cv2.imshow("image - " + str(i),gray)
+    img_array = np.array(newGray)
+
+    vector = img_array.flatten()
+    #img_list.extend(vector)
+    img_list.append(vector)
+
+img_list = np.array(img_list)
+img_list = img_list.astype('float32')
+print(img_list.shape)
+#image = np.reshape(data, (2, 4))
+for row in img_list:
+    image = np.reshape(img_list[row],(150,120))
+    cv2.imshow("image - " + str(i), image)
+print(img_list)
+cv2.waitKey(0)
