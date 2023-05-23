@@ -52,6 +52,13 @@ m = np.array(m)
 
 covariance.append(m.dot(mt))                  # 300 by 300
 covariance = np.array(covariance)
-print(covariance.shape)
+
+eigenvalues, eigenvectors = np.linalg.eig(covariance) # 고윳값 고유벡터 구하는 함수
+
+#for i in range(len(eigenvalues)):
+    #print("고윳값 {}: {}".format(i+1, eigenvalues[i]))
+    #print("고유벡터 {}: {}".format(i+1, eigenvectors[:, i]))
+
+#print(covariance.shape)
 
 cv2.waitKey(0)
