@@ -1,27 +1,57 @@
 import cv2
+import numpy
 import numpy as np
 
+img_height = 150
+img_wight = 120
+img_len = img_wight * img_height
 img_list = []
+imgAverage = []
 
-for i in range(0,10):
-    fname = "face_img/train/train{0:03d}.jpg".format(i)
-    img = cv2.imread(fname,cv2.IMREAD_COLOR)
-
-    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    newGray = cv2.resize(gray, (150,120))
+train_image = 300
+def processing_img(path):
+    imgColor = cv2.imread(path,cv2.IMREAD_COLOR)
+    gray = cv2.cvtColor(imgColor,cv2.COLOR_BGR2GRAY)
     #cv2.imshow("image - " + str(i),gray)
-    img_array = np.array(newGray)
+    Finaly_gray = cv2.resize(gray,(img_wight,img_height))
+    return np.array(Finaly_gray).flatten()
 
-    vector = img_array.flatten()
-    #img_list.extend(vector)
+def show_img(inputing,imgname):
+    img = np.reshape(inputing,(img_height,img_wight))
+    img = img.astype('uint8')
+    cv2.imshow(imgname,img)
+
+for i in range(0,train_image):
+    path ="face_img/train/train{0:03d}.jpg".format(i)
+    vector = processing_img(path)
     img_list.append(vector)
 
 img_list = np.array(img_list)
 img_list = img_list.astype('float32')
-print(img_list.shape)
-#image = np.reshape(data, (2, 4))
-for row in img_list:
-    image = np.reshape(img_list[row],(150,120))
-    cv2.imshow("image - " + str(i), image)
-print(img_list)
+
+for i in range(0,img_len):
+    sum = 0.0
+    for j in range(0,train_image):
+        sum += img_list[j][i]
+    imgAverage.append(sum / train_image )
+
+m = [] # 원본 - 평균 영상
+mt = []
+#show_img(imgAverage,"a")
+covariance = [] # 공분산행렬
+
+for i in range(0,train_image):
+    m.append( [] )
+    for j in range(0,img_len):
+        m[i].append( img_list[i][j] - imgAverage[j] )
+
+#for i in range(0,train_image):
+    #show_img(m[i],"{0:03d}".format(i))
+mt = np.array(m).T
+m = np.array(m)
+
+covariance.append(m.dot(mt))                  # 300 by 300
+covariance = np.array(covariance)
+print(covariance.shape)
+
 cv2.waitKey(0)
