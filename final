@@ -1,6 +1,6 @@
 import cv2
-import numpy
 import numpy as np
+import matplotlib.pyplot as plt
 
 img_height = 150
 img_wight = 120
@@ -53,12 +53,21 @@ m = np.array(m)
 covariance.append(m.dot(mt))                  # 300 by 300
 covariance = np.array(covariance)
 
+
+covariance = np.reshape(covariance,(300,300))
+#print(covariance.shape)
+
 eigenvalues, eigenvectors = np.linalg.eig(covariance) # 고윳값 고유벡터 구하는 함수
+
+x = np.arange(len(eigenvalues))
+
+plt.plot(x, eigenvalues)
+plt.show()
 
 #for i in range(len(eigenvalues)):
     #print("고윳값 {}: {}".format(i+1, eigenvalues[i]))
     #print("고유벡터 {}: {}".format(i+1, eigenvectors[:, i]))
 
-#print(covariance.shape)
+
 
 cv2.waitKey(0)
