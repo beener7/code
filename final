@@ -23,11 +23,14 @@ def show_img(inputing,imgname): #만든 이미지를 보여주는 함수
     cv2.imshow(imgname,img) #이미지 보여주기
 
 def get_top_eigenpairs(matrix, k): #고윳값과 고유벡터의 최고값 불러오기
+    matrix = np.reshape(matrix,(310,310))
     eigenvalues, eigenvectors = np.linalg.eig(matrix) # 고윳값과 고유벡터 저장
+
+
     sorted_indices = np.argsort(eigenvalues)[::-1] # 정렬
-    
+
     sorted_eigenvalues = eigenvalues[sorted_indices]
-    
+
     sorted_eigenvectors = eigenvectors[:, sorted_indices]
 
     top_eigenvalues = sorted_eigenvalues[:k]
@@ -95,14 +98,17 @@ v = 3 # 고유벡터 3개 사용
 
 top_eigenvalues, top_eigenvectors = get_top_eigenpairs(covariance, v) # 고윳값과 고유벡터 쌍의 높은순서로 v개 가져옴
 V = [] # 변환행렬
-V = np.array(top_eigenvectors).T #변환행렬의 전치
+V = np.array(top_eigenvectors).T #변환행렬의 전치 (3,310)
 
-x_hat = []
+# top_eigenvalues = 3 ,  top_eigenvectors = (310,3)
 
-for i in range(0,img_len):
-    x_hat.append(V[i]*m[i])
+x_hat = [] # x_hat  = V_t * x_bar , x_bar = m (310, 18000)
 
-print(x_hat.shape)
+x_hat.append(V.dot(m) ) # 3 310 310 18000
+
+x_hat = np.array(x_hat)
+x_hat = np.reshape(x_hat,(3,18000))
+# x_hat (3,18000)
 
 #for i in range(0,len(eigenvalues)):
     #print("고윳값 {}: {}".format(i+1, eigenvalues[i]))
