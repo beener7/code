@@ -25,7 +25,9 @@ def show_img(inputing,imgname): #만든 이미지를 보여주는 함수
 def get_top_eigenpairs(matrix, k): #고윳값과 고유벡터의 최고값 불러오기
     eigenvalues, eigenvectors = np.linalg.eig(matrix) # 고윳값과 고유벡터 저장
     sorted_indices = np.argsort(eigenvalues)[::-1] # 정렬
+    
     sorted_eigenvalues = eigenvalues[sorted_indices]
+    
     sorted_eigenvectors = eigenvectors[:, sorted_indices]
 
     top_eigenvalues = sorted_eigenvalues[:k]
@@ -77,7 +79,7 @@ covariance.append(m.dot(mt))     # 공분산 행렬 1 by 300 by 300
 covariance = np.array(covariance)
 
 
-covariance_2d = np.reshape(covariance,(300,300))  # 300 by 300 으로 변환
+covariance_2d = np.reshape(covariance,(310,310))  # 310 by 310 으로 변환
 #print(covariance.shape)
 
 eigenvalues, eigenvectors = np.linalg.eig(covariance) # 고윳값 고유벡터 구하는 함수
