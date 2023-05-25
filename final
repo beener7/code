@@ -2,28 +2,29 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-img_height = 150
-img_wight = 120
-img_len = img_wight * img_height
+img_height = 150 #사진 세로
+img_wight = 120 #사진 가로
+img_len = img_wight * img_height # 사진 크기
 img_list = []
 imgAverage = []
 
-train_image = 300
-def processing_img(path):
-    imgColor = cv2.imread(path,cv2.IMREAD_COLOR)
-    gray = cv2.cvtColor(imgColor,cv2.COLOR_BGR2GRAY)
-    #cv2.imshow("image - " + str(i),gray)
-    Finaly_gray = cv2.resize(gray,(img_wight,img_height))
-    return np.array(Finaly_gray).flatten()
+train_image = 310  #학습 이미지
 
-def show_img(inputing,imgname):
-    img = np.reshape(inputing,(img_height,img_wight))
-    img = img.astype('uint8')
-    cv2.imshow(imgname,img)
+def processing_img(path): # 이미지 처리하는 함수
+    imgColor = cv2.imread(path,cv2.IMREAD_COLOR) # 이미지를 컬러로 받아옴
+    gray = cv2.cvtColor(imgColor,cv2.COLOR_BGR2GRAY) # 받아온 이미지를 그레이로 변경
+    #cv2.imshow("image - " + str(i),gray) # 이미지 보여주는 함수
+    Finaly_gray = cv2.resize(gray,(img_wight,img_height)) # 이미지의 크기를 120 150으로 바꿔주는 함수
+    return np.array(Finaly_gray).flatten() # 결과값을 1차원 배열로 보냄
 
-def get_top_eigenpairs(matrix, k):
-    eigenvalues, eigenvectors = np.linalg.eig(matrix)
-    sorted_indices = np.argsort(eigenvalues)[::-1]
+def show_img(inputing,imgname): #만든 이미지를 보여주는 함수
+    img = np.reshape(inputing,(img_height,img_wight)) # 1차원이미지를 다시 2차원으로
+    img = img.astype('uint8') #이미지 타입변경
+    cv2.imshow(imgname,img) #이미지 보여주기
+
+def get_top_eigenpairs(matrix, k): #고윳값과 고유벡터의 최고값 불러오기
+    eigenvalues, eigenvectors = np.linalg.eig(matrix) # 고윳값과 고유벡터 저장
+    sorted_indices = np.argsort(eigenvalues)[::-1] # 정렬
     sorted_eigenvalues = eigenvalues[sorted_indices]
     sorted_eigenvectors = eigenvectors[:, sorted_indices]
 
@@ -31,19 +32,25 @@ def get_top_eigenpairs(matrix, k):
     top_eigenvectors = sorted_eigenvectors[:, :k]
 
     return top_eigenvalues, top_eigenvectors
-for i in range(0,train_image):
+
+for i in range(0,train_image): #이미지 전부를 1차원벡터로 저장
     path ="face_img/train/train{0:03d}.jpg".format(i)
     vector = processing_img(path)
-    img_list.append(vector)
+    img_list.append(vector) #모든이미지가 1차원으로 저장
 
-img_list = np.array(img_list)
-img_list = img_list.astype('float32')
 
-for i in range(0,img_len):
+img_list = np.array(img_list) # 크기 (310, 18000)
+img_list = img_list.astype('float32') #1번
+
+#2번시작
+
+for i in range(0,img_len): # 18000만큼
     sum = 0.0
     for j in range(0,train_image):
         sum += img_list[j][i]
     imgAverage.append(sum / train_image )
+
+# imgAverage 길이 18000
 
 m = [] # 원본 - 평균 영상
 mt = []
@@ -55,16 +62,22 @@ for i in range(0,train_image):
     for j in range(0,img_len):
         m[i].append( img_list[i][j] - imgAverage[j] )
 
+# m의 크기 (310,18000) , mt의 크기(18000,310)
+# m => X_bar
+
 #for i in range(0,train_image):
     #show_img(m[i],"{0:03d}".format(i))
+
 mt = np.array(m).T
 m = np.array(m)
 
-covariance.append(m.dot(mt))                  # 300 by 300
+covariance_2d = [ [ ] ]
+
+covariance.append(m.dot(mt))     # 공분산 행렬 1 by 300 by 300
 covariance = np.array(covariance)
 
 
-covariance = np.reshape(covariance,(300,300))
+covariance_2d = np.reshape(covariance,(300,300))  # 300 by 300 으로 변환
 #print(covariance.shape)
 
 eigenvalues, eigenvectors = np.linalg.eig(covariance) # 고윳값 고유벡터 구하는 함수
@@ -72,19 +85,15 @@ eigenvalues, eigenvectors = np.linalg.eig(covariance) # 고윳값 고유벡터 �
 #plt.plot(eigenvalues) #고윳값의 그래프를 보여줌
 #plt.show()
 
-
-
 sort_eigenvalues = []
-len = len(eigenvalues)
-
 
 v = 3 # 고유벡터 3개 사용
 
 #print(eigenvectors.shape)
 
-top_eigenvalues, top_eigenvectors = get_top_eigenpairs(covariance, v)
-V = []
-V = np.array(top_eigenvectors).T
+top_eigenvalues, top_eigenvectors = get_top_eigenpairs(covariance, v) # 고윳값과 고유벡터 쌍의 높은순서로 v개 가져옴
+V = [] # 변환행렬
+V = np.array(top_eigenvectors).T #변환행렬의 전치
 
 x_hat = []
 
