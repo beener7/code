@@ -104,7 +104,8 @@ V = np.array(top_eigenvectors).T #변환행렬의 전치 (3,310)
 
 x_hat = [] # x_hat  = V_t * x_bar , x_bar = m (310, 18000)
 
-x_hat.append(V.dot(m) ) # 3 310 310 18000
+x_hat.append(V.dot(m) ) # 3 310 310 18000 x 원래는 3 18000 18000 1
+                        # V = 18000 * 3 x_bar = 18000 * 1
 
 x_hat = np.array(x_hat)
 x_hat = np.reshape(x_hat,(3,18000))
