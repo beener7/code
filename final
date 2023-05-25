@@ -21,6 +21,16 @@ def show_img(inputing,imgname):
     img = img.astype('uint8')
     cv2.imshow(imgname,img)
 
+def get_top_eigenpairs(matrix, k):
+    eigenvalues, eigenvectors = np.linalg.eig(matrix)
+    sorted_indices = np.argsort(eigenvalues)[::-1]
+    sorted_eigenvalues = eigenvalues[sorted_indices]
+    sorted_eigenvectors = eigenvectors[:, sorted_indices]
+
+    top_eigenvalues = sorted_eigenvalues[:k]
+    top_eigenvectors = sorted_eigenvectors[:, :k]
+
+    return top_eigenvalues, top_eigenvectors
 for i in range(0,train_image):
     path ="face_img/train/train{0:03d}.jpg".format(i)
     vector = processing_img(path)
@@ -59,15 +69,30 @@ covariance = np.reshape(covariance,(300,300))
 
 eigenvalues, eigenvectors = np.linalg.eig(covariance) # 고윳값 고유벡터 구하는 함수
 
-x = np.arange(len(eigenvalues))
+#plt.plot(eigenvalues) #고윳값의 그래프를 보여줌
+#plt.show()
 
-plt.plot(x, eigenvalues)
-plt.show()
 
-#for i in range(len(eigenvalues)):
+
+sort_eigenvalues = []
+len = len(eigenvalues)
+
+
+v = 3 # 고유벡터 3개 사용
+
+print(eigenvectors.shape)
+
+top_eigenvalues, top_eigenvectors = get_top_eigenpairs(covariance, v)
+V = []
+V = np.array(top_eigenvectors).T
+
+
+#for i in range(0,len(eigenvalues)):
     #print("고윳값 {}: {}".format(i+1, eigenvalues[i]))
     #print("고유벡터 {}: {}".format(i+1, eigenvectors[:, i]))
 
+num = input("테스트할 사진의 번호를 입력하시오: ")
+path = "face_img/test/test{0:03d}.jpg".format(num)
 
 
 cv2.waitKey(0)
