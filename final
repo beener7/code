@@ -80,19 +80,42 @@ len = len(eigenvalues)
 
 v = 3 # 고유벡터 3개 사용
 
-print(eigenvectors.shape)
+#print(eigenvectors.shape)
 
 top_eigenvalues, top_eigenvectors = get_top_eigenpairs(covariance, v)
 V = []
 V = np.array(top_eigenvectors).T
 
+x_hat = []
+
+for i in range(0,img_len):
+    x_hat.append(V[i]*m[i])
+
+print(x_hat.shape)
 
 #for i in range(0,len(eigenvalues)):
     #print("고윳값 {}: {}".format(i+1, eigenvalues[i]))
     #print("고유벡터 {}: {}".format(i+1, eigenvectors[:, i]))
 
-num = input("테스트할 사진의 번호를 입력하시오: ")
-path = "face_img/test/test{0:03d}.jpg".format(num)
+num = int(input("테스트할 사진의 번호를 입력하시오: "))
+test_path = "face_img/test/test{0:03d}.jpg".format(num)
+test_img = processing_img(test_path)
 
+print(test_img)
+print(imgAverage)
+
+testAverage = []
+y_hat = []
+
+for i in range(0, img_len):
+    testAverage.append(test_img[i] - imgAverage[i])
+
+
+
+for i in range(0, img_len):
+    y_hat.append(V[i] * testAverage[i])
+
+
+print(testAverage)
 
 cv2.waitKey(0)
