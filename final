@@ -22,22 +22,6 @@ def show_img(inputing,imgname): #만든 이미지를 보여주는 함수
     img = img.astype('uint8') #이미지 타입변경
     cv2.imshow(imgname,img) #이미지 보여주기
 
-def get_top_eigenpairs(matrix, k): #고윳값과 고유벡터의 최고값 불러오기
-    matrix = np.reshape(matrix,(310,310))
-    eigenvalues, eigenvectors = np.linalg.eig(matrix) # 고윳값과 고유벡터 저장
-
-
-    sorted_indices = np.argsort(eigenvalues)[::-1] # 정렬
-
-    sorted_eigenvalues = eigenvalues[sorted_indices]
-
-    sorted_eigenvectors = eigenvectors[:, sorted_indices]
-
-    top_eigenvalues = sorted_eigenvalues[:k]
-    top_eigenvectors = sorted_eigenvectors[:, :k]
-
-    return top_eigenvalues, top_eigenvectors
-
 for i in range(0,train_image): #이미지 전부를 1차원벡터로 저장
     path ="face_img/train/train{0:03d}.jpg".format(i)
     vector = processing_img(path)
@@ -57,83 +41,94 @@ for i in range(0,img_len): # 18000만큼
 
 # imgAverage 길이 18000
 
-m = [] # 원본 - 평균 영상
-mt = []
+X_bar = []
+
 #show_img(imgAverage,"a")
 covariance = [] # 공분산행렬
 
 for i in range(0,train_image):
-    m.append( [] )
+    X_bar.append( [] )
     for j in range(0,img_len):
-        m[i].append( img_list[i][j] - imgAverage[j] )
+        X_bar[i].append( img_list[i][j] - imgAverage[j] )
 
-# m의 크기 (310,18000) , mt의 크기(18000,310)
-# m => X_bar
+# X_bar의 크기 (310,18000) , X_bart의 크기(18000,310)
 
 #for i in range(0,train_image):
     #show_img(m[i],"{0:03d}".format(i))
 
-mt = np.array(m).T
-m = np.array(m)
+X_bar_t = np.array(X_bar).T
+X_bar = np.array(X_bar)
 
 covariance_2d = [ [ ] ]
 
-covariance.append(m.dot(mt))     # 공분산 행렬 1 by 300 by 300
+covariance = X_bar @  X_bar_t   # 공분산 행렬 1 by 300 by 300
 covariance = np.array(covariance)
 
+k = 3 # 고유벡터 3개 사용
 
 covariance_2d = np.reshape(covariance,(310,310))  # 310 by 310 으로 변환
-#print(covariance.shape)
 
-eigenvalues, eigenvectors = np.linalg.eig(covariance) # 고윳값 고유벡터 구하는 함수
+eigenvalues, eigenvectors = np.linalg.eig(covariance_2d) # 고윳값 고유벡터 구하는 함수
+
+eigenvalues, eigenvectors = np.real(eigenvalues),np.real(eigenvectors)
 
 #plt.plot(eigenvalues) #고윳값의 그래프를 보여줌
 #plt.show()
 
-sort_eigenvalues = []
 
-v = 3 # 고유벡터 3개 사용
+index_dict = {eigenvalues[i]: i for i in range(len(eigenvalues))}
 
-#print(eigenvectors.shape)
+eigenvalues.sort()
 
-top_eigenvalues, top_eigenvectors = get_top_eigenpairs(covariance, v) # 고윳값과 고유벡터 쌍의 높은순서로 v개 가져옴
-V = [] # 변환행렬
-V = np.array(top_eigenvectors).T #변환행렬의 전치 (3,310)
+eigenvalues = eigenvalues[::-1]
 
-# top_eigenvalues = 3 ,  top_eigenvectors = (310,3)
+evalue = eigenvalues[:k]
 
-x_hat = [] # x_hat  = V_t * x_bar , x_bar = m (310, 18000)
+V = np.array([eigenvectors[:, index_dict[i]] for i in evalue])
 
-x_hat.append(V.dot(m) ) # 3 310 310 18000 x 원래는 3 18000 18000 1
-                        # V = 18000 * 3 x_bar = 18000 * 1
+V = X_bar.T @ V.T
+V = V / np.sqrt(np.sum(V**2))
+V = V.T
 
-x_hat = np.array(x_hat)
-x_hat = np.reshape(x_hat,(3,18000))
-# x_hat (3,18000)
+X = V @ X_bar.T #V = ( 3 , 18000) X = (3 , 310)
 
-#for i in range(0,len(eigenvalues)):
-    #print("고윳값 {}: {}".format(i+1, eigenvalues[i]))
-    #print("고유벡터 {}: {}".format(i+1, eigenvectors[:, i]))
 
-num = int(input("테스트할 사진의 번호를 입력하시오: "))
+num = int(input("테스트할 사진의 번호를 입력하시오( 0 ~ 92 ) : "))
 test_path = "face_img/test/test{0:03d}.jpg".format(num)
 test_img = processing_img(test_path)
 
-print(test_img)
-print(imgAverage)
 
 testAverage = []
-y_hat = []
 
 for i in range(0, img_len):
-    testAverage.append(test_img[i] - imgAverage[i])
+    testAverage.append(test_img[i] - imgAverage[i]) #18000 1
 
 
-
-for i in range(0, img_len):
-    y_hat.append(V[i] * testAverage[i])
+testAverage = np.array(testAverage)
 
 
-print(testAverage)
+y_hat = V @ testAverage
+
+result = []
+for i in range(X.shape[1]):
+    result.append(np.sqrt(((y_hat.T - X[:, i]) ** 2).sum()))
+
+result_idx = 0
+min = result[0]
+
+for i, m in enumerate(result, 1):
+    if m < min:
+        min = m
+        result_idx = i
+
+test_image = cv2.imread("face_img/test/test{0:03d}.jpg".format(num),cv2.IMREAD_COLOR) # 이미지를 컬러로 받아옴
+target_image = cv2.imread("face_img/train/train{0:03d}.jpg".format(result_idx),cv2.IMREAD_COLOR) # 이미지를 컬러로 받아옴
+
+test_image = cv2.resize(test_image,(250,300))
+target_image = cv2.resize(target_image,(250,300))
+
+cv2.imshow("test_{0:03d}       ".format(num)  , test_image )
+cv2.imshow("train_{0:03d}      ".format(result_idx) , target_image )
+
 
 cv2.waitKey(0)
