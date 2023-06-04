@@ -1,0 +1,50 @@
+import cv2
+import numpy as np
+from header.plate_preprocess import *
+
+# 학습된 SVM 모델 로드
+svm = cv2.ml.SVM_load('SVMtrain.xml')
+
+# 이미지 로드
+#car_no = int(input("자동차 영상 번호(0~15): "))
+#image = cv2.imread("images/car/%02d.jpg" % car_no, cv2.IMREAD_COLOR)
+
+car_no = int(input("자동차 영상 번호(0~15): "))
+image, morph = preprocessing(car_no)
+
+# 이미지 전처리
+#gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#blur = cv2.GaussianBlur(gray, (5, 5), 0)
+#edges = cv2.Canny(blur, 50, 150)
+
+
+candidates = find_candidates(morph)
+
+
+# Contour 검출
+#contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+# 번호판 검출
+for candidate in candidates:
+    x, y, w, h = cv2.boundingRect(candidate)
+
+    # 번호판 크기 조건
+    if w > 100 and h > 20:
+        # 번호판 ROI 추출
+        roi = image[y:y + h, x:x + w]
+
+        # SVM 입력 형태로 변환
+        roi = cv2.resize(roi, (100, 20))
+        roi = np.float32(roi.reshape(-1, 100 * 20))
+
+        # SVM 예측
+        _, result = svm.predict(roi)
+
+        # 번호판인 경우
+        if result[0][0] == 1.0:
+            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+# 결과 출력
+cv2.imshow('License Plate Detection', image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
