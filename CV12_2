@@ -1,0 +1,38 @@
+import cv2
+import numpy as np
+
+
+# 학습된 SVM 모델 로드
+svm = cv2.ml.SVM_load('SVMtrain.xml')
+
+# 이미지 불러오기
+car_no = int(input("자동차 영상 번호(0~15): "))
+image = cv2.imread("images/car/%02d.jpg" %car_no, cv2.IMREAD_COLOR)
+
+# 이미지 변환
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+window_size = (150, 10)
+step_size = 5 # 5로 할경우 0 이나 1에서 잘 찾지만 3이나 6에서 너무 많이 찾음
+#step_size = 7 #7로 할경우 3이나 6에서 적당히 찾지만 0이나 1에서 찾지를 못함
+
+for y in range(0, gray.shape[0] - window_size[1], step_size):
+    for x in range(0, gray.shape[1] - window_size[0], step_size):
+
+        # 슬라이딩 윈도우 추출
+        window = gray[y:y + window_size[1], x:x + window_size[0]]
+
+        # SVM 입력 형태로 변환
+        window = cv2.resize(window, (144, 28))
+        window = window.astype(np.float32).reshape(1, -1)
+
+        # SVM 예측
+        _, result = svm.predict(window)
+
+        # 번호판인 경우
+        if result[0][0] == 1.0:
+            cv2.rectangle(image, (x, y), (x + window_size[0], y + window_size[1]), (0, 255, 0), 2)
+
+# 결과 출력
+cv2.imshow('결과 영상', image)
+cv2.waitKey(0)
